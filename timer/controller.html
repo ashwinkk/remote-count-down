@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Count Down Controller</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="shortcut icon" href="/favicon">
+    <link rel="stylesheet" href="/foundation">
+    <style>
+        body {
+            height: 100vh;
+            background-color: #ed7060;
+        }
+        
+        .timer-area {
+            width: 100%;
+            font-size: 5em;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #863021;
+        }
+        
+        .button-area {
+            text-align: center;
+        }
+        
+        .timer-local-area {
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="timer-local-area">
+        <div class="timer-area">
+            <time id="countdown">18:00</time>
+        </div>
+        <div class="button-area">
+            <button class="success button" onClick="startTimer()">START</button>
+            <button class="secondary button" onClick="resetTimer()">RESET</button>
+            <button class="alert button" onClick="pauseTimer()">PAUSE</button>
+        </div>
+    </div>
+</body>
+<script>
+    var seconds = 1080;
+    var domText = document.getElementById("countdown");
+    var countdownTimer;
+    var socks = new WebSocket("ws://192.168.43.92:8080");
+
+    function startTimer() {
+        console.log("hello");
+        socks.send("start");
+        secondPassed();
+        countdownTimer = setInterval('secondPassed()', 1000);
+    }
+
+    function resetTimer() {
+        console.log("hello");
+        socks.send("reset");
+        seconds = 1080;
+        clearInterval(countdownTimer);
+        domText.innerHTML = "18:00";
+    }
+
+    function pauseTimer() {
+        console.log("hello");
+        socks.send("pause");
+        clearInterval(countdownTimer);
+    }
+
+
+    function secondPassed() {
+        var minutes = Math.round((seconds - 30) / 60),
+            remainingSeconds = seconds % 60;
+
+        if (remainingSeconds < 10) {
+            remainingSeconds = "0" + remainingSeconds;
+        }
+
+        document.getElementById('countdown').innerHTML = minutes + ":" + remainingSeconds;
+        if (seconds == 0) {
+            clearInterval(countdownTimer);
+            document.getElementById('countdown').innerHTML = "00:00";
+        } else {
+            seconds--;
+        }
+    }
+</script>
+
+
+
+</html>
